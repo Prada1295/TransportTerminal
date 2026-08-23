@@ -1,5 +1,5 @@
 //
-//  RegisterVehicleEntryUseCaseTests.swift
+//  RegisterVehicleExitUseCaseTests.swift
 //  TransportTerminal
 //
 //  Created by Andres Felipe Prada Chivata on 22/08/26.
@@ -10,7 +10,7 @@ import Testing
 @testable import TransportTerminal
 
 @MainActor
-struct RegisterVehicleEntryUseCaseTests {
+struct RegisterVehicleExitUseCaseTests {
     @Test func executeWhenVehicleDoesNotExistThrowsVehicleNotFound() async throws {
         let sut = makeSUT()
 
@@ -19,52 +19,38 @@ struct RegisterVehicleEntryUseCaseTests {
         }
     }
 
-    @Test func executeWhenCompanyDoesNotExistThrowsCompanyNotFound() async throws {
-        let vehicle = makeVehicle(status: .outsideTerminal)
-        let sut = makeSUT(vehicles: [vehicle])
-
-        await expectTerminalError(.companyNotFound) {
-            _ = try await sut.execute(vehicleId: vehicle.id)
-        }
-    }
-
-    @Test func executeWhenCompanyIsInactiveThrowsCompanyInactive() async throws {
-        let company = makeCompany(isActive: false)
-        let vehicle = makeVehicle(companyId: company.id, status: .outsideTerminal)
-        let sut = makeSUT(vehicles: [vehicle], companies: [company])
-
-        await expectTerminalError(.companyInactive) {
-            _ = try await sut.execute(vehicleId: vehicle.id)
-        }
-    }
-
     @Test func executeWhenVehicleIsInMaintenanceThrowsVehicleInMaintenance() async throws {
-        let company = makeCompany()
-        let vehicle = makeVehicle(companyId: company.id, status: .maintenance)
-        let sut = makeSUT(vehicles: [vehicle], companies: [company])
+        let vehicle = makeVehicle(status: .maintenance)
+        let sut = makeSUT(vehicles: [vehicle])
 
         await expectTerminalError(.vehicleInMaintenance) {
             _ = try await sut.execute(vehicleId: vehicle.id)
         }
     }
 
-    @Test func executeWhenVehicleIsAlreadyInsideThrowsVehicleAlreadyInside() async throws {
-        let company = makeCompany()
-        let vehicle = makeVehicle(companyId: company.id, status: .insideTerminal)
-        let sut = makeSUT(vehicles: [vehicle], companies: [company])
+    @Test func executeWhenVehicleIsOutsideTerminalThrowsVehicleNotInsideTerminal() async throws {
+        let vehicle = makeVehicle(status: .outsideTerminal)
+        let sut = makeSUT(vehicles: [vehicle])
 
-        await expectTerminalError(.vehicleAlreadyInside) {
+        await expectTerminalError(.vehicleNotInsideTerminal) {
             _ = try await sut.execute(vehicleId: vehicle.id)
         }
     }
 
-    @Test func executeWhenValidVehicleRegistersEntry() async throws {
-        let company = makeCompany()
-        let vehicle = makeVehicle(companyId: company.id, status: .outsideTerminal)
-        let repositories = makeRepositories(vehicles: [vehicle], companies: [company])
+    @Test func executeWhenVehicleIsDispatchedThrowsVehicleNotInsideTerminal() async throws {
+        let vehicle = makeVehicle(status: .dispatched)
+        let sut = makeSUT(vehicles: [vehicle])
+
+        await expectTerminalError(.vehicleNotInsideTerminal) {
+            _ = try await sut.execute(vehicleId: vehicle.id)
+        }
+    }
+
+    @Test func executeWhenValidVehicleRegistersExit() async throws {
+        let vehicle = makeVehicle(status: .insideTerminal)
+        let repositories = makeRepositories(vehicles: [vehicle])
         let sut = makeSUT(
             vehicleRepository: repositories.vehicleRepository,
-            companyRepository: repositories.companyRepository,
             movementRepository: repositories.movementRepository
         )
 
@@ -74,69 +60,47 @@ struct RegisterVehicleEntryUseCaseTests {
         #expect(result.plate == vehicle.plate)
         #expect(repositories.movementRepository.savedMovements.count == 1)
         #expect(repositories.movementRepository.savedMovements.first?.vehicleId == vehicle.id)
-        #expect(repositories.movementRepository.savedMovements.first?.type == .entry)
-        #expect(repositories.vehicleRepository.updatedVehicles.first?.status == .insideTerminal)
+        #expect(repositories.movementRepository.savedMovements.first?.type == .exit)
+        #expect(repositories.vehicleRepository.updatedVehicles.first?.status == .outsideTerminal)
     }
 }
 
-private extension RegisterVehicleEntryUseCaseTests {
+private extension RegisterVehicleExitUseCaseTests {
     func makeSUT(
         vehicles: [Vehicle] = [],
-        companies: [Company] = [],
         movements: [VehicleMovement] = []
-    ) -> RegisterVehicleEntryUseCase {
+    ) -> RegisterVehicleExitUseCase {
         let repositories = makeRepositories(
             vehicles: vehicles,
-            companies: companies,
             movements: movements
         )
 
         return makeSUT(
             vehicleRepository: repositories.vehicleRepository,
-            companyRepository: repositories.companyRepository,
             movementRepository: repositories.movementRepository
         )
     }
 
     func makeSUT(
         vehicleRepository: VehicleRepository,
-        companyRepository: CompanyRepository,
         movementRepository: VehicleMovementRepository
-    ) -> RegisterVehicleEntryUseCase {
-        RegisterVehicleEntry(
+    ) -> RegisterVehicleExitUseCase {
+        RegisterVehicleExit(
             vehicleRepository: vehicleRepository,
-            companyRepository: companyRepository,
             movementRepository: movementRepository
         )
     }
 
     func makeRepositories(
         vehicles: [Vehicle] = [],
-        companies: [Company] = [],
         movements: [VehicleMovement] = []
     ) -> (
-        vehicleRepository: FakeVehicleRepository,
-        companyRepository: FakeCompanyRepository,
-        movementRepository: FakeVehicleMovementRepository
+        vehicleRepository: FakeExitVehicleRepository,
+        movementRepository: FakeExitVehicleMovementRepository
     ) {
         (
-            vehicleRepository: FakeVehicleRepository(vehicles: vehicles),
-            companyRepository: FakeCompanyRepository(companies: companies),
-            movementRepository: FakeVehicleMovementRepository(movements: movements)
-        )
-    }
-
-    func makeCompany(
-        id: UUID = UUID(),
-        name: String = "Expreso Bolivariano",
-        nit: String = "900123456",
-        isActive: Bool = true
-    ) -> Company {
-        Company(
-            id: id,
-            name: name,
-            nit: nit,
-            isActive: isActive
+            vehicleRepository: FakeExitVehicleRepository(vehicles: vehicles),
+            movementRepository: FakeExitVehicleMovementRepository(movements: movements)
         )
     }
 
@@ -146,7 +110,7 @@ private extension RegisterVehicleEntryUseCaseTests {
         companyId: UUID = UUID(),
         type: VehicleType = .bus,
         capacity: Int = 40,
-        status: VehicleStatus = .outsideTerminal
+        status: VehicleStatus = .insideTerminal
     ) -> Vehicle {
         Vehicle(
             id: id,
@@ -173,7 +137,7 @@ private extension RegisterVehicleEntryUseCaseTests {
     }
 }
 
-private final class FakeVehicleRepository: VehicleRepository {
+private final class FakeExitVehicleRepository: VehicleRepository {
     private var vehicles: [Vehicle]
     private(set) var updatedVehicles: [Vehicle] = []
 
@@ -204,27 +168,7 @@ private final class FakeVehicleRepository: VehicleRepository {
     }
 }
 
-private final class FakeCompanyRepository: CompanyRepository {
-    private var companies: [Company]
-
-    init(companies: [Company]) {
-        self.companies = companies
-    }
-
-    func getById(_ id: UUID) async throws -> Company? {
-        companies.first { $0.id == id }
-    }
-
-    func getAll() async throws -> [Company] {
-        companies
-    }
-
-    func save(_ company: Company) async throws {
-        companies.append(company)
-    }
-}
-
-private final class FakeVehicleMovementRepository: VehicleMovementRepository {
+private final class FakeExitVehicleMovementRepository: VehicleMovementRepository {
     private(set) var savedMovements: [VehicleMovement]
 
     init(movements: [VehicleMovement]) {

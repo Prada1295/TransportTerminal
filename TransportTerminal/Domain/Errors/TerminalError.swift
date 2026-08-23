@@ -11,4 +11,5 @@ public enum TerminalError: Error, Equatable {
     case companyInactive
     case vehicleAlreadyInside
     case vehicleInMaintenance
+    case vehicleNotInsideTerminal
 }
