@@ -12,4 +12,10 @@ public enum TerminalError: Error, Equatable {
     case vehicleAlreadyInside
     case vehicleInMaintenance
     case vehicleNotInsideTerminal
+    case routeNotFound
+    case routeInactive
+    case bayNotFound
+    case bayInactive
+    case vehicleAlreadyHasActiveDispatch
+    case bayAlreadyHasActiveDispatch
 }
