@@ -18,4 +18,7 @@ public enum TerminalError: Error, Equatable {
     case bayInactive
     case vehicleAlreadyHasActiveDispatch
     case bayAlreadyHasActiveDispatch
+    case dispatchNotFound
+    case dispatchAlreadyCancelled
+    case dispatchAlreadyDeparted
 }

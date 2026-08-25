@@ -416,4 +416,8 @@ private final class FakeCreateDispatchDispatchRepository: DispatchRepository {
     func getActiveDispatches() async throws -> [Dispatch] {
         activeDispatches
     }
+
+    func update(_ dispatch: Dispatch) async throws {
+        savedDispatches.append(dispatch)
+    }
 }
