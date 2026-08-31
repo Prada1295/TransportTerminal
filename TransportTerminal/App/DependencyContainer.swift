@@ -55,6 +55,12 @@ public final class DependencyContainer {
         GetVehiclesInsideTerminal(vehicleRepository: vehicleRepository)
     }
     
+    public func makeGetVehiclesUseCase() -> GetVehiclesUseCase {
+        GetVehicles(
+            vehicleRepository: vehicleRepository
+        )
+    }
+    
     public func makeCreateDispatchUseCase() -> CreateDispatchUseCase {
         CreateDispatch(
             vehicleRepository: vehicleRepository,
@@ -86,6 +92,24 @@ public final class DependencyContainer {
     func makeVehicleDetailViewModel() -> VehicleDetailViewModel {
         VehicleDetailViewModel(
             getVehicleDetailsUseCase: makeGetVehicleDetailsUseCase()
+        )
+    }
+    
+    @MainActor
+    func makeDashboardViewModel() -> DashboardViewModel {
+        DashboardViewModel(
+            getVehiclesInsideTerminalUseCase:
+                makeGetVehiclesInsideTerminalUseCase(),
+            getVehiclesUseCase:
+                makeGetVehiclesUseCase()
+        )
+    }
+    
+    @MainActor
+    func makeRegisterVehicleEntryViewModel() -> RegisterVehicleEntryViewModel {
+        RegisterVehicleEntryViewModel(
+            registerVehicleEntryUseCase:
+                makeRegisterVehicleEntryUseCase()
         )
     }
 

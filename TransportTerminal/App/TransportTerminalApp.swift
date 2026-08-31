@@ -13,7 +13,9 @@ struct TransportTerminalApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView(container: container)
+            DashboardView(
+                container: container
+            )
         }
     }
 }
