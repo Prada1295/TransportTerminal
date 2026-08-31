@@ -33,7 +33,6 @@
 		7738E84030390C8F00E295AF /* Exceptions for "TransportTerminal" folder in "TransportTerminal" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				App/DependencyContainer.swift,
 				Info.plist,
 			);
 			target = 7738E81730390C8C00E295AF /* TransportTerminal */;

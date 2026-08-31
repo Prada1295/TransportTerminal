@@ -14,7 +14,7 @@ public final class DependencyContainer {
     public let bayRepository: BayRepository
     public let dispatchRepository: DispatchRepository
     public let movementRepository: VehicleMovementRepository
-
+    
     public init() {
         self.vehicleRepository = InMemoryVehicleRepository(
             vehicles: InMemorySeedData.vehicles
@@ -35,7 +35,7 @@ public final class DependencyContainer {
             movements: InMemorySeedData.movements
         )
     }
-
+    
     public func makeRegisterVehicleEntryUseCase() -> RegisterVehicleEntryUseCase {
         RegisterVehicleEntry(
             vehicleRepository: vehicleRepository,
@@ -43,18 +43,18 @@ public final class DependencyContainer {
             movementRepository: movementRepository
         )
     }
-
+    
     public func makeRegisterVehicleExitUseCase() -> RegisterVehicleExitUseCase {
         RegisterVehicleExit(
             vehicleRepository: vehicleRepository,
             movementRepository: movementRepository
         )
     }
-
+    
     public func makeGetVehiclesInsideTerminalUseCase() -> GetVehiclesInsideTerminalUseCase {
         GetVehiclesInsideTerminal(vehicleRepository: vehicleRepository)
     }
-
+    
     public func makeCreateDispatchUseCase() -> CreateDispatchUseCase {
         CreateDispatch(
             vehicleRepository: vehicleRepository,
@@ -63,8 +63,19 @@ public final class DependencyContainer {
             dispatchRepository: dispatchRepository
         )
     }
-
+    
     public func makeCancelDispatchUseCase() -> CancelDispatchUseCase {
         CancelDispatch(dispatchRepository: dispatchRepository)
     }
+    
+    
+    @MainActor
+    func makeHomeViewModel() -> HomeViewModel {
+        HomeViewModel(
+            getVehiclesInsideTerminalUseCase: makeGetVehiclesInsideTerminalUseCase()
+        )
+    }
+
 }
+
+
