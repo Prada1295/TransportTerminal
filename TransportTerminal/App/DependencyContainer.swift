@@ -68,11 +68,24 @@ public final class DependencyContainer {
         CancelDispatch(dispatchRepository: dispatchRepository)
     }
     
+    public func makeGetVehicleDetailsUseCase() -> GetVehicleDetailsUseCase {
+        GetVehicleDetails(
+            vehicleRepository: vehicleRepository,
+            companyRepository: companyRepository
+        )
+    }
     
     @MainActor
     func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel(
             getVehiclesInsideTerminalUseCase: makeGetVehiclesInsideTerminalUseCase()
+        )
+    }
+    
+    @MainActor
+    func makeVehicleDetailViewModel() -> VehicleDetailViewModel {
+        VehicleDetailViewModel(
+            getVehicleDetailsUseCase: makeGetVehicleDetailsUseCase()
         )
     }
 
