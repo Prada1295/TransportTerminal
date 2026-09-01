@@ -30,6 +30,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7708F4BA30467E680095773A /* Exceptions for "TransportTerminal" folder in "TransportTerminalTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Data/Seed/InMemorySeedData.swift,
+				Domain/Entities/Company.swift,
+			);
+			target = 7738E82D30390C8F00E295AF /* TransportTerminalTests */;
+		};
 		7738E84030390C8F00E295AF /* Exceptions for "TransportTerminal" folder in "TransportTerminal" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -44,6 +52,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				7738E84030390C8F00E295AF /* Exceptions for "TransportTerminal" folder in "TransportTerminal" target */,
+				7708F4BA30467E680095773A /* Exceptions for "TransportTerminal" folder in "TransportTerminalTests" target */,
 			);
 			path = TransportTerminal;
 			sourceTree = "<group>";
