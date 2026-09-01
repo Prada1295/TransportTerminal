@@ -12,7 +12,6 @@ struct VehicleDetailView: View {
 
     @State private var viewModel: VehicleDetailViewModel
 
-    @Environment(\.dismiss) private var dismiss
 
     init(
         vehicleId: UUID,
@@ -33,34 +32,6 @@ struct VehicleDetailView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-
-                // MARK: - Header
-
-                HStack {
-
-                    Button {
-                        dismiss()
-                    } label: {
-                        HStack(spacing: 5) {
-                            Image(systemName: "chevron.left")
-                            Text("Back")
-                        }
-                    }
-
-                    Spacer()
-
-                    Text("Vehicle Details")
-                        .font(.headline)
-
-                    Spacer()
-
-                    Color.clear
-                        .frame(width: 55)
-                }
-                .frame(height: 52)
-                .padding(.horizontal, 16)
-
-                Divider()
 
                 // MARK: - Content
 
@@ -90,6 +61,8 @@ struct VehicleDetailView: View {
             }
             .frame(maxWidth: .infinity, alignment: .top)
         }
+        .navigationTitle("Vehicle Details")
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadVehicleDetails(
                 vehicleId: vehicleId
