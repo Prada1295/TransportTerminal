@@ -67,7 +67,7 @@ private extension GetVehicleDetailsUseCaseTests {
 
     func makeSUT(
         vehicles: [Vehicle] = [],
-        companies: [Company] = []
+        companies: [TransportTerminal.Company] = []
     ) -> GetVehicleDetailsUseCase {
 
         GetVehicleDetails(
@@ -104,9 +104,9 @@ private extension GetVehicleDetailsUseCaseTests {
         name: String = "Transportes Nacionales",
         nit: String = "900123456",
         isActive: Bool = true
-    ) -> Company {
+    ) -> TransportTerminal.Company {
 
-        Company(
+        TransportTerminal.Company(
             id: id,
             name: name,
             nit: nit,

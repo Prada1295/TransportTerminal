@@ -112,7 +112,17 @@ public final class DependencyContainer {
                 makeRegisterVehicleEntryUseCase()
         )
     }
-
+    
+    @MainActor
+    func makeRegisterVehicleExitViewModel() -> RegisterVehicleExitViewModel {
+        RegisterVehicleExitViewModel(
+            getVehiclesInsideTerminalUseCase:
+                makeGetVehiclesInsideTerminalUseCase(),
+            registerVehicleExitUseCase:
+                makeRegisterVehicleExitUseCase()
+        )
+    }
+    
 }
 
 

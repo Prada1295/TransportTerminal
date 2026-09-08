@@ -82,10 +82,10 @@ struct RegisterVehicleEntryUseCaseTests {
 private extension RegisterVehicleEntryUseCaseTests {
     func makeSUT(
         vehicles: [Vehicle] = [],
-        companies: [Company] = [],
+        companies: [TransportTerminal.Company] = [],
         movements: [VehicleMovement] = []
     ) -> RegisterVehicleEntryUseCase {
-        let repositories = makeRepositories(
+        let repositories = makeRepositories(	
             vehicles: vehicles,
             companies: companies,
             movements: movements
@@ -112,7 +112,7 @@ private extension RegisterVehicleEntryUseCaseTests {
 
     func makeRepositories(
         vehicles: [Vehicle] = [],
-        companies: [Company] = [],
+        companies: [TransportTerminal.Company] = [],
         movements: [VehicleMovement] = []
     ) -> (
         vehicleRepository: FakeVehicleRepository,
@@ -131,8 +131,8 @@ private extension RegisterVehicleEntryUseCaseTests {
         name: String = "Expreso Bolivariano",
         nit: String = "900123456",
         isActive: Bool = true
-    ) -> Company {
-        Company(
+    ) -> TransportTerminal.Company {
+        TransportTerminal.Company(
             id: id,
             name: name,
             nit: nit,
@@ -205,21 +205,21 @@ private final class FakeVehicleRepository: VehicleRepository {
 }
 
 private final class FakeCompanyRepository: CompanyRepository {
-    private var companies: [Company]
+    private var companies: [TransportTerminal.Company]
 
-    init(companies: [Company]) {
+    init(companies: [TransportTerminal.Company]) {
         self.companies = companies
     }
 
-    func getById(_ id: UUID) async throws -> Company? {
+    func getById(_ id: UUID) async throws -> TransportTerminal.Company? {
         companies.first { $0.id == id }
     }
 
-    func getAll() async throws -> [Company] {
+    func getAll() async throws -> [TransportTerminal.Company] {
         companies
     }
 
-    func save(_ company: Company) async throws {
+    func save(_ company: TransportTerminal.Company) async throws {
         companies.append(company)
     }
 }

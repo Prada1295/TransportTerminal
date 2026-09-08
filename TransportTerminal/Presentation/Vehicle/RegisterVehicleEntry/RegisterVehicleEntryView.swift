@@ -1,5 +1,5 @@
 //
-//  RegisterVehicleEntryView.swift
+//  RegisterVehicleEntryView.swift›
 //  TransportTerminal
 //
 //  Created by Andres Felipe Prada Chivata on 31/08/26.

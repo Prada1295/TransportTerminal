@@ -79,7 +79,6 @@ The main goal is to keep business rules independent from the UI and data impleme
 │  ViewModels                                 │
 └──────────────────────┬──────────────────────┘
                        │
-                       ▼
 ┌─────────────────────────────────────────────┐
 │                   Domain                    │
 │                                             │
