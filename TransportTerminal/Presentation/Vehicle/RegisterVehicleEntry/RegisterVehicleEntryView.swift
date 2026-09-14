@@ -190,6 +190,13 @@ struct RegisterVehicleEntryView: View {
             }
             .navigationTitle("Vehicle Entry")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+            }
             .confirmationDialog(
                 "Register Vehicle Entry?",
                 isPresented: $showingConfirmation,

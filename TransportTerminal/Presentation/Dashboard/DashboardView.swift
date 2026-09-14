@@ -12,6 +12,7 @@ struct DashboardView: View {
     
     @State private var viewModel: DashboardViewModel
     @State private var showingVehicleEntry = false
+    @State private var showingVehicleExit = false
     
     init(container: DependencyContainer) {
         self.container = container
@@ -273,7 +274,7 @@ struct DashboardView: View {
                                 title: "Vehicle Exit",
                                 systemImage: "arrow.up.circle"
                             ) {
-                                //Coming next
+                                showingVehicleExit = true
                             }
                             
                             DashboardActionButton(
@@ -309,6 +310,10 @@ struct DashboardView: View {
                 RegisterVehicleEntryView(
                     vehicles: viewModel.vehiclesAvailableForEntry,
                     viewModel: container.makeRegisterVehicleEntryViewModel()
+                )
+            }
+            .sheet(isPresented: $showingVehicleExit) {
+                RegisterVehicleExitView(viewModel: container.makeRegisterVehicleExitViewModel()
                 )
             }
         }

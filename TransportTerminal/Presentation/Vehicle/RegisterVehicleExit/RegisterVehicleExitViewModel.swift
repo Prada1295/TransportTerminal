@@ -92,4 +92,9 @@ final class RegisterVehicleExitViewModel {
                 "Unable to register vehicle exit."
         }
     }
+    
+    func clearError() {
+        errorMessage = nil
+    }
+    
 }
