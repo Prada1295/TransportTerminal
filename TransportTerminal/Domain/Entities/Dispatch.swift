@@ -13,5 +13,6 @@ public struct Dispatch: Identifiable {
     public let routeId: UUID
     public let bayId: UUID
     public let scheduledDeparture: Date
+    public var actualDeparture: Date?
     public var status: DispatchStatus
 }
