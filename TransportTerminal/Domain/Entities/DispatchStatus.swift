@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public enum DispatchStatus: String {
+public enum DispatchStatus: String, Equatable {
     case scheduled
     case boarding
     case departed

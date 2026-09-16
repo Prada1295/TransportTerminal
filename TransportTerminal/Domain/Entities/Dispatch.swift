@@ -7,7 +7,7 @@
 import Foundation
 
 
-public struct Dispatch: Identifiable {
+public struct Dispatch: Identifiable, Equatable {
     public let id: UUID
     public let vehicleId: UUID
     public let routeId: UUID

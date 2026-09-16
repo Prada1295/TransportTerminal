@@ -39,9 +39,11 @@ struct ExecuteDispatchUseCaseTests {
             _ = try await sut.execute(dispatchId: dispatch.id)
         }
     }
-
+    
     @Test
     func executeWhenDispatchIsScheduledExecutesDeparture() async throws {
+
+        // Arrange
         let vehicleId = UUID()
 
         let dispatch = makeDispatch(
@@ -51,17 +53,15 @@ struct ExecuteDispatchUseCaseTests {
 
         let exitTimestamp = Date()
 
-        let exitResult = makeVehicleExitResult(
-            vehicleId: vehicleId,
-            timestamp: exitTimestamp
+        let vehicleExit = FakeExecuteDispatchVehicleExitUseCase(
+            result: makeVehicleExitResult(
+                vehicleId: vehicleId,
+                timestamp: exitTimestamp
+            )
         )
 
         let dispatchRepository = makeRepositories(
             dispatches: [dispatch]
-        )
-
-        let vehicleExit = FakeExecuteDispatchVehicleExitUseCase(
-            result: exitResult
         )
 
         let sut = makeSUT(
@@ -69,30 +69,41 @@ struct ExecuteDispatchUseCaseTests {
             registerVehicleExit: vehicleExit
         )
 
+        // Act
         let result = try await sut.execute(
             dispatchId: dispatch.id
         )
 
-        #expect(result.dispatchId == dispatch.id)
-        #expect(result.vehicleId == dispatch.vehicleId)
-        #expect(result.routeId == dispatch.routeId)
-        #expect(result.bayId == dispatch.bayId)
-        #expect(result.scheduledDeparture == dispatch.scheduledDeparture)
-        #expect(result.actualDeparture == exitTimestamp)
-        #expect(result.status == .departed)
-
-        #expect(vehicleExit.executedVehicleIds.count == 1)
-        #expect(vehicleExit.executedVehicleIds.first == vehicleId)
-
-        #expect(dispatchRepository.updatedDispatches.count == 1)
-        #expect(dispatchRepository.updatedDispatches.first?.id == dispatch.id)
-        #expect(dispatchRepository.updatedDispatches.first?.status == .departed)
+        // Assert
         #expect(
-            dispatchRepository.updatedDispatches.first?.actualDeparture
-                == exitTimestamp
+            result == ExecuteDispatchResult(
+                dispatchId: dispatch.id,
+                vehicleId: dispatch.vehicleId,
+                routeId: dispatch.routeId,
+                bayId: dispatch.bayId,
+                scheduledDeparture: dispatch.scheduledDeparture,
+                actualDeparture: exitTimestamp,
+                status: .departed
+            )
+        )
+
+        #expect(vehicleExit.executedVehicleIds == [vehicleId])
+
+        #expect(
+            dispatchRepository.updatedDispatches == [
+                Dispatch(
+                    id: dispatch.id,
+                    vehicleId: dispatch.vehicleId,
+                    routeId: dispatch.routeId,
+                    bayId: dispatch.bayId,
+                    scheduledDeparture: dispatch.scheduledDeparture,
+                    actualDeparture: exitTimestamp,
+                    status: .departed
+                )
+            ]
         )
     }
-
+    
     @Test
     func executeWhenDispatchIsBoardingExecutesDeparture() async throws {
         let vehicleId = UUID()
