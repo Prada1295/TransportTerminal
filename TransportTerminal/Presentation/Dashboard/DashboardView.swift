@@ -13,6 +13,7 @@ struct DashboardView: View {
     @State private var viewModel: DashboardViewModel
     @State private var showingVehicleEntry = false
     @State private var showingVehicleExit = false
+    @State private var showingDispatches = false
     
     init(container: DependencyContainer) {
         self.container = container
@@ -281,7 +282,7 @@ struct DashboardView: View {
                                 title: "Dispatches",
                                 systemImage: "clock.arrow.circlepath"
                             ) {
-                                //Coming next
+                                showingDispatches = true
                             }
                             
                             DashboardActionButton(
@@ -314,6 +315,12 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showingVehicleExit) {
                 RegisterVehicleExitView(viewModel: container.makeRegisterVehicleExitViewModel()
+                )
+            }
+            
+            .sheet(isPresented: $showingDispatches) {
+                DispatchesView(
+                    viewModel: container.makeDispatchesViewModel()
                 )
             }
         }

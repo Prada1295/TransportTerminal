@@ -74,6 +74,19 @@ public final class DependencyContainer {
         CancelDispatch(dispatchRepository: dispatchRepository)
     }
     
+    public func makeGetActiveDispatchesUseCase() -> GetActiveDispatchesUseCase {
+        GetActiveDispatches(
+            dispatchRepository: dispatchRepository
+        )
+    }
+    
+    public func makeExecuteDispatchUseCase() -> ExecuteDispatchUseCase {
+        ExecuteDispatch(
+            dispatchRepository: dispatchRepository,
+            registerVehicleExit: makeRegisterVehicleExitUseCase()
+        )
+    }
+    
     public func makeGetVehicleDetailsUseCase() -> GetVehicleDetailsUseCase {
         GetVehicleDetails(
             vehicleRepository: vehicleRepository,
@@ -102,6 +115,18 @@ public final class DependencyContainer {
                 makeGetVehiclesInsideTerminalUseCase(),
             getVehiclesUseCase:
                 makeGetVehiclesUseCase()
+        )
+    }
+    
+    @MainActor
+    func makeDispatchesViewModel() -> DispatchesViewModel {
+        DispatchesViewModel(
+            getActiveDispatchesUseCase:
+                makeGetActiveDispatchesUseCase(),
+            cancelDispatchUseCase:
+                makeCancelDispatchUseCase(),
+            executeDispatchUseCase:
+                makeExecuteDispatchUseCase()
         )
     }
     
