@@ -11,25 +11,48 @@ import Observation
 @Observable
 final class DashboardViewModel {
 
-    private let getVehiclesInsideTerminalUseCase: GetVehiclesInsideTerminalUseCase
-    
-    private let getVehiclesUseCase: GetVehiclesUseCase
-    
-    private(set) var vehiclesAvailableForEntry: [Vehicle] = []
+    private let getVehiclesInsideTerminalUseCase:
+        GetVehiclesInsideTerminalUseCase
 
+    private let getVehiclesUseCase:
+        GetVehiclesUseCase
+
+    private let getActiveDispatchesUseCase:
+        GetActiveDispatchesUseCase
+
+    private let bayRepository:
+        BayRepository
+
+    private(set) var vehiclesAvailableForEntry: [Vehicle] = []
     private(set) var vehiclesInsideTerminal: [Vehicle] = []
 
-    private(set) var isLoading = false
+    private(set) var activeDispatches: [Dispatch] = []
+    private(set) var occupiedBayCount = 0
 
+    private(set) var isLoading = false
     private(set) var errorMessage: String?
 
     init(
         getVehiclesInsideTerminalUseCase:
-        GetVehiclesInsideTerminalUseCase, getVehiclesUseCase: GetVehiclesUseCase
+            GetVehiclesInsideTerminalUseCase,
+        getVehiclesUseCase:
+            GetVehiclesUseCase,
+        getActiveDispatchesUseCase:
+            GetActiveDispatchesUseCase,
+        bayRepository:
+            BayRepository
     ) {
-        self.getVehiclesInsideTerminalUseCase = getVehiclesInsideTerminalUseCase
-        
-        self.getVehiclesUseCase = getVehiclesUseCase
+        self.getVehiclesInsideTerminalUseCase =
+            getVehiclesInsideTerminalUseCase
+
+        self.getVehiclesUseCase =
+            getVehiclesUseCase
+
+        self.getActiveDispatchesUseCase =
+            getActiveDispatchesUseCase
+
+        self.bayRepository =
+            bayRepository
     }
 
     func loadDashboard() async {
@@ -49,29 +72,54 @@ final class DashboardViewModel {
             async let allVehicles =
                 getVehiclesUseCase.execute()
 
+            async let dispatches =
+                getActiveDispatchesUseCase.execute()
+
+            async let bays =
+                bayRepository.getAll()
+
             let (
                 vehiclesInside,
-                vehicles
+                vehicles,
+                activeDispatches,
+                allBays
             ) = try await (
                 insideVehicles,
-                allVehicles
+                allVehicles,
+                dispatches,
+                bays
             )
 
-            vehiclesInsideTerminal = vehiclesInside
+            vehiclesInsideTerminal =
+                vehiclesInside
 
-            vehiclesAvailableForEntry = vehicles.filter {
-                $0.status == .outsideTerminal
-            }
+            vehiclesAvailableForEntry =
+                vehicles.filter {
+                    $0.status == .outsideTerminal
+                }
+
+            self.activeDispatches =
+                activeDispatches
+
+            let occupiedBayIds =
+                Set(
+                    activeDispatches.map(\.bayId)
+                )
+
+            occupiedBayCount =
+                allBays.filter {
+                    occupiedBayIds.contains($0.id)
+                }.count
 
         } catch {
 
             vehiclesInsideTerminal = []
             vehiclesAvailableForEntry = []
+            activeDispatches = []
+            occupiedBayCount = 0
 
             errorMessage =
                 "Unable to load dashboard information."
         }
     }
 }
-
-

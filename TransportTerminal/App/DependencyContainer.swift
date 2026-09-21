@@ -114,7 +114,11 @@ public final class DependencyContainer {
             getVehiclesInsideTerminalUseCase:
                 makeGetVehiclesInsideTerminalUseCase(),
             getVehiclesUseCase:
-                makeGetVehiclesUseCase()
+                makeGetVehiclesUseCase(),
+            getActiveDispatchesUseCase:
+                makeGetActiveDispatchesUseCase(),
+            bayRepository:
+                bayRepository
         )
     }
     

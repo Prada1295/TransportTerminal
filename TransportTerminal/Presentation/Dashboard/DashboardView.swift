@@ -81,14 +81,14 @@ struct DashboardView: View {
                                 
                                 DashboardMetricCard(
                                     title: "Dispatches",
-                                    value: "6",
+                                    value: "\(viewModel.activeDispatches.count)",
                                     subtitle: "Active",
                                     systemImage: "clock.arrow.circlepath"
                                 )
                                 
                                 DashboardMetricCard(
                                     title: "Bays",
-                                    value: "8",
+                                    value: "\(viewModel.occupiedBayCount)",
                                     subtitle: "Occupied",
                                     systemImage: "rectangle.split.3x1"
                                 )
@@ -201,52 +201,61 @@ struct DashboardView: View {
                     }
                     
                     // MARK: - Active Dispatches
-                    
+
                     VStack(alignment: .leading, spacing: 12) {
-                        
+
                         HStack {
-                            
                             Text("Active Dispatches")
                                 .font(.headline)
-                            
+
                             Spacer()
-                            
+
                             Button("See All") {
                                 // Navigation will be connected later.
                             }
                             .font(.subheadline)
                         }
-                        
-                        VStack(spacing: 0) {
-                            
-                            DashboardDispatchRow(
-                                plate: "ABC123",
-                                route: "Medellín → Bogotá",
-                                departure: "14:30",
-                                bay: "Bay 04"
+
+                        if viewModel.activeDispatches.isEmpty {
+
+                            ContentUnavailableView(
+                                "No active dispatches",
+                                systemImage: "clock.arrow.circlepath",
+                                description: Text(
+                                    "Scheduled dispatches will appear here."
+                                )
                             )
-                            
-                            Divider()
-                            
-                            DashboardDispatchRow(
-                                plate: "DEF456",
-                                route: "Medellín → Cali",
-                                departure: "15:00",
-                                bay: "Bay 07"
+
+                        } else {
+
+                            VStack(spacing: 0) {
+
+                                ForEach(viewModel.activeDispatches) { dispatch in
+
+                                    DashboardDispatchRow(
+                                        dispatch: dispatch
+                                    )
+
+                                    if dispatch.id !=
+                                        viewModel.activeDispatches.last?.id {
+
+                                        Divider()
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .background(
+                                Color(
+                                    uiColor:
+                                        .secondarySystemGroupedBackground
+                                )
+                            )
+                            .clipShape(
+                                RoundedRectangle(
+                                    cornerRadius: 16
+                                )
                             )
                         }
-                        .padding(.horizontal, 16)
-                        .background(
-                            Color(
-                                uiColor:
-                                        .secondarySystemGroupedBackground
-                            )
-                        )
-                        .clipShape(
-                            RoundedRectangle(
-                                cornerRadius: 16
-                            )
-                        )
                     }
                     
                     // MARK: - Quick Actions
@@ -416,39 +425,68 @@ private struct DashboardVehicleRow: View {
 // MARK: - Dispatch Row
 
 private struct DashboardDispatchRow: View {
-    
-    let plate: String
-    let route: String
-    let departure: String
-    let bay: String
-    
+
+    let dispatch: Dispatch
+
+    private var departureTime: String {
+        dispatch.scheduledDeparture.formatted(
+            date: .omitted,
+            time: .shortened
+        )
+    }
+
     var body: some View {
-        
+
         HStack(spacing: 12) {
-            
+
             Image(systemName: "arrow.up.circle")
                 .font(.title3)
                 .foregroundStyle(.tint)
-            
+
             VStack(alignment: .leading, spacing: 4) {
-                
-                Text(plate)
+
+                Text("Dispatch")
                     .font(.headline)
-                
-                Text(route)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                
-                Text("\(bay) • Departure \(departure)")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+
+                Text(
+                    "Vehicle \(shortID(dispatch.vehicleId))"
+                )
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+                Text(
+                    "Bay \(shortID(dispatch.bayId))"
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+                Text(
+                    "Departure \(departureTime)"
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
-            
+
             Spacer()
+
+            Text(dispatch.status.rawValue.capitalized)
+                .font(.caption)
+                .fontWeight(.medium)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 5)
+                .background(
+                    .blue.opacity(0.15),
+                    in: Capsule()
+                )
         }
         .padding(.vertical, 14)
     }
+
+    private func shortID(_ id: UUID) -> String {
+        String(id.uuidString.prefix(8))
+    }
 }
+
 
 // MARK: - Action Button
 
