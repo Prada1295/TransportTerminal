@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public enum VehicleStatus: String, Codable {
+public enum VehicleStatus: String, Codable, Equatable {
     case outsideTerminal
     case insideTerminal
     case dispatched

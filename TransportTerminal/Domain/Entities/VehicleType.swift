@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public enum VehicleType: String, Codable {
+public enum VehicleType: String, Codable, Equatable {
     case bus
     case buseta
     case microbus

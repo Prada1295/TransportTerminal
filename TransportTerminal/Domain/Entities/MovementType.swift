@@ -6,7 +6,7 @@
 //
 import Foundation
 
-public enum MovementType: String {
+public enum MovementType: String, Codable, Equatable {
     case entry
     case exit
 }
