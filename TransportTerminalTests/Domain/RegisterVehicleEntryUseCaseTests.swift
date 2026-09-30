@@ -128,7 +128,7 @@ private extension RegisterVehicleEntryUseCaseTests {
 
     func makeCompany(
         id: UUID = UUID(),
-        name: String = "Expreso Bolivariano",
+        name: String = "companyOne",
         nit: String = "900123456",
         isActive: Bool = true
     ) -> TransportTerminal.Company {

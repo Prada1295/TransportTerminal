@@ -11,13 +11,13 @@ public enum InMemorySeedData {
 
     // MARK: - Companies
 
-    public static let bolivarianoCompanyId =
+    public static let companyOneId =
         UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
 
-    public static let rapidoOchoaCompanyId =
+    public static let companyTwoId =
         UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
 
-    public static let flotaOccidentalCompanyId =
+    public static let companyThreeId =
         UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
 
     // MARK: - Routes
@@ -47,23 +47,24 @@ public enum InMemorySeedData {
     public static let companies: [Company] = [
 
         Company(
-            id: bolivarianoCompanyId,
-            name: "Expreso Bolivariano",
-            nit: "900123456",
+            id: companyOneId,
+            name: "Company One",
+            nit: "000000001",
             isActive: true
         ),
 
         Company(
-            id: rapidoOchoaCompanyId,
-            name: "Rapido Ochoa",
-            nit: "900654321",
+            
+            id: companyTwoId,
+            name: "Company Two",
+            nit: "000000002",
             isActive: true
         ),
 
         Company(
-            id: flotaOccidentalCompanyId,
-            name: "Flota Occidental",
-            nit: "901987654",
+            id: companyThreeId,
+            name: "Company Three",
+            nit: "0000000003",
             isActive: false
         )
     ]
@@ -79,7 +80,7 @@ public enum InMemorySeedData {
                 uuidString: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
             )!,
             plate: "DEF456",
-            companyId: rapidoOchoaCompanyId,
+            companyId: companyOneId,
             type: .buseta,
             capacity: 28,
             status: .insideTerminal
@@ -90,7 +91,7 @@ public enum InMemorySeedData {
                 uuidString: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
             )!,
             plate: "JKL234",
-            companyId: bolivarianoCompanyId,
+            companyId: companyTwoId,
             type: .bus,
             capacity: 42,
             status: .insideTerminal
@@ -101,7 +102,7 @@ public enum InMemorySeedData {
                 uuidString: "cccccccc-cccc-cccc-cccc-cccccccccccc"
             )!,
             plate: "MNO567",
-            companyId: rapidoOchoaCompanyId,
+            companyId: companyTwoId,
             type: .bus,
             capacity: 45,
             status: .insideTerminal
@@ -112,7 +113,7 @@ public enum InMemorySeedData {
                 uuidString: "dddddddd-dddd-dddd-dddd-dddddddddddd"
             )!,
             plate: "PQR890",
-            companyId: bolivarianoCompanyId,
+            companyId: companyOneId,
             type: .microbus,
             capacity: 18,
             status: .insideTerminal
@@ -123,7 +124,7 @@ public enum InMemorySeedData {
                 uuidString: "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"
             )!,
             plate: "STU321",
-            companyId: rapidoOchoaCompanyId,
+            companyId: companyTwoId,
             type: .buseta,
             capacity: 30,
             status: .insideTerminal
@@ -134,7 +135,7 @@ public enum InMemorySeedData {
                 uuidString: "ffffffff-ffff-ffff-ffff-ffffffffffff"
             )!,
             plate: "VWX654",
-            companyId: bolivarianoCompanyId,
+            companyId: companyTwoId,
             type: .bus,
             capacity: 40,
             status: .insideTerminal
@@ -147,7 +148,7 @@ public enum InMemorySeedData {
                 uuidString: "10101010-1010-1010-1010-101010101010"
             )!,
             plate: "ABC123",
-            companyId: bolivarianoCompanyId,
+            companyId: companyOneId,
             type: .bus,
             capacity: 42,
             status: .outsideTerminal
@@ -158,7 +159,7 @@ public enum InMemorySeedData {
                 uuidString: "20202020-2020-2020-2020-202020202020"
             )!,
             plate: "YZA987",
-            companyId: rapidoOchoaCompanyId,
+            companyId: companyTwoId,
             type: .buseta,
             capacity: 28,
             status: .outsideTerminal
@@ -171,7 +172,7 @@ public enum InMemorySeedData {
                 uuidString: "30303030-3030-3030-3030-303030303030"
             )!,
             plate: "GHI789",
-            companyId: bolivarianoCompanyId,
+            companyId: companyOneId,
             type: .microbus,
             capacity: 18,
             status: .maintenance

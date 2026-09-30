@@ -1,8 +1,8 @@
 # Transport Terminal
 
-An iOS application prototype for managing and monitoring operational activities inside a transportation terminal.
+An iOS application for managing and monitoring the daily operations of a ground passenger transport terminal.
 
-The project is being developed as a portfolio project to demonstrate iOS development practices, Clean Architecture, MVVM, dependency injection, asynchronous operations, repository abstraction, and automated testing using Swift and SwiftUI.
+Built as a portfolio project to demonstrate iOS development practices: Clean Architecture, MVVM, dependency injection, asynchronous operations, repository abstraction, and automated testing with Swift and SwiftUI.
 
 ---
 
@@ -12,9 +12,35 @@ Transport Terminal is an operational management application designed around the 
 
 The current version focuses on vehicle management and terminal movements, providing a foundation that can evolve into a broader operational management system.
 
-The application is currently using in-memory repositories and seeded data while the domain and presentation layers are being developed.
+The Data layer currently uses **in-memory repositories and seed data by design** — this allows the entire application to be developed, tested, and demonstrated before the backend exists. When the backend is ready, only the `Data` layer will change; the `Domain` and `Presentation` layers will remain untouched.
 
-Right now the app is still in an early stage, so it's using in-memory data just to test things out. Later on, I plan to connect it to a real API and an external database, so the app can actually save data properly and be more scalable. That should help turn this into a more solid solution for companies in this industry.
+---
+
+## Tech Stack
+
+- **Language:** Swift 5.9+
+- **UI:** SwiftUI
+- **Concurrency:** `async`/`await`, `actor`, `@MainActor`
+- **State:** Observation framework (`@Observable`)
+- **Architecture:** Clean Architecture + MVVM
+- **Persistence:** SwiftData (planned)
+- **Backend:** ASP.NET Core + Entity Framework Core (planned)
+
+---
+
+## Architecture
+
+The project follows **Clean Architecture**, with MVVM inside the Presentation layer.
+
+
+- **Domain** — Entities, enums, errors, repository protocols, and use cases. No framework dependencies.
+- **Data** — Repository implementations, DTOs, mappers, and seed data.
+- **Presentation** — SwiftUI views and `@Observable` ViewModels.
+- **App** — Dependency injection container (composition root) and `@main` entry point.
+
+Dependencies point inward. The `Domain` layer knows nothing about UI, networking, or persistence.
+
+For detailed architecture documentation, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ---
 
@@ -22,42 +48,64 @@ Right now the app is still in an early stage, so it's using in-memory data just 
 
 ### Operational Dashboard
 
-The Dashboard provides an overview of the current terminal operation.
-
-Currently implemented:
+Provides an overview of the current terminal operation:
 
 - Vehicles inside the terminal
+- Vehicles available for entry
 - Vehicle operational status
-- Basic operational metrics
-- Active dispatches UI prototype
-- Quick actions
-- Vehicle navigation
+- Active dispatches
+- Bay occupancy count
 
 ### Vehicle Details
 
-Users can select a vehicle from the Dashboard and access its details.
-
-Currently displayed information includes:
+Select a vehicle from the Dashboard to view its details:
 
 - License plate
 - Vehicle type
 - Capacity
-- Vehicle status
+- Operational status
 - Associated company
 
 ### Vehicle Entry
 
-The application currently supports registering a vehicle entry into the terminal.
+Register a vehicle entry into the terminal:
 
-The flow includes:
+1. Select an available vehicle
+2. Confirm the operation
+3. Register the vehicle entry
+4. Create a vehicle movement
+5. Update the vehicle status to `insideTerminal`
 
-1. Selecting an available vehicle
-2. Confirming the operation
-3. Registering the vehicle entry
-4. Creating a vehicle movement
-5. Updating the vehicle status to `insideTerminal`
+### Vehicle Exit
 
-Business rules are handled by the domain layer rather than the SwiftUI views.
+Register a vehicle exit from the terminal:
+
+1. View the list of vehicles currently inside the terminal
+2. Select a vehicle
+3. Confirm the operation
+4. Register the exit
+5. Create a vehicle movement
+6. Update the vehicle status to `outsideTerminal`
+
+### Dispatches
+
+Create, monitor, and execute vehicle dispatches:
+
+- Create a dispatch linking a vehicle, route, and bay
+- Cancel an active dispatch
+- Execute a dispatch (registers the vehicle exit and marks the dispatch as departed)
+
+---
+
+## Business Rules
+
+Business rules live in the **Domain** layer, not in SwiftUI views or ViewModels. Examples:
+
+- A vehicle must not be in maintenance to enter or exit.
+- A vehicle must be inside the terminal to be dispatched.
+- A vehicle can have only one active dispatch at a time.
+- A bay can host only one active dispatch at a time.
+- Only active routes and active bays can be used for a dispatch.
 
 ---
 

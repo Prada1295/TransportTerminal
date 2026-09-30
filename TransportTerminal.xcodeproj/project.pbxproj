@@ -27,6 +27,7 @@
 		7738E81830390C8C00E295AF /* TransportTerminal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TransportTerminal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7738E82E30390C8F00E295AF /* TransportTerminalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransportTerminalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7738E83830390C8F00E295AF /* TransportTerminalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransportTerminalUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		776CC6B7306CABB800E7858A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,6 +89,8 @@
 		7738E80F30390C8C00E295AF = {
 			isa = PBXGroup;
 			children = (
+				776CC78F306CB01300E7858A /* docs */,
+				776CC6B7306CABB800E7858A /* README.md */,
 				7738E81A30390C8C00E295AF /* TransportTerminal */,
 				7738E83130390C8F00E295AF /* TransportTerminalTests */,
 				7738E83B30390C8F00E295AF /* TransportTerminalUITests */,
@@ -103,6 +106,13 @@
 				7738E83830390C8F00E295AF /* TransportTerminalUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		776CC78F306CB01300E7858A /* docs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
