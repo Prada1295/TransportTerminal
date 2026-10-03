@@ -329,7 +329,15 @@ struct DashboardView: View {
             
             .sheet(isPresented: $showingDispatches) {
                 DispatchesView(
-                    viewModel: container.makeDispatchesViewModel()
+                    viewModel: container.makeDispatchesViewModel(),
+                    createDispatchViewModelFactory: {
+                        container.makeCreateDispatchViewModel()
+                    },
+                    dispatchDetailViewModelFactory: { dispatch in
+                        container.makeDispatchDetailViewModel(
+                            dispatch: dispatch
+                        )
+                    }
                 )
             }
         }

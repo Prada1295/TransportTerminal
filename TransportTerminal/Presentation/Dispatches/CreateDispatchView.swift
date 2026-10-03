@@ -198,12 +198,12 @@ private extension CreateDispatchView {
 #Preview {
     CreateDispatchView(
         viewModel: CreateDispatchViewModel(
-            vehicleRepository:
-                PreviewCreateDispatchVehicleRepository(),
-            routeRepository:
-                PreviewCreateDispatchRouteRepository(),
-            bayRepository:
-                PreviewCreateDispatchBayRepository(),
+            getVehiclesInsideTerminalUseCase:
+                PreviewCreateDispatchVehiclesInsideTerminalUseCase(),
+            getActiveRoutesUseCase:
+                PreviewCreateDispatchActiveRoutesUseCase(),
+            getAvailableBaysUseCase:
+                PreviewCreateDispatchAvailableBaysUseCase(),
             createDispatchUseCase:
                 PreviewCreateDispatchUseCase()
         )
@@ -212,10 +212,10 @@ private extension CreateDispatchView {
 
 // MARK: - Preview Fakes
 
-private struct PreviewCreateDispatchVehicleRepository:
-    VehicleRepository {
+private struct PreviewCreateDispatchVehiclesInsideTerminalUseCase:
+    GetVehiclesInsideTerminalUseCase {
 
-    func getAll() async throws -> [Vehicle] {
+    func execute() async throws -> [Vehicle] {
         [
             Vehicle(
                 id: UUID(),
@@ -235,24 +235,12 @@ private struct PreviewCreateDispatchVehicleRepository:
             )
         ]
     }
-
-    func getById(_ id: UUID) async throws -> Vehicle? {
-        nil
-    }
-
-    func save(_ vehicle: Vehicle) async throws {}
-
-    func update(_ vehicle: Vehicle) async throws {}
 }
 
-private struct PreviewCreateDispatchRouteRepository:
-    RouteRepository {
+private struct PreviewCreateDispatchActiveRoutesUseCase:
+    GetActiveRoutesUseCase {
 
-    func getById(_ id: UUID) async throws -> Route? {
-        nil
-    }
-
-    func getAll() async throws -> [Route] {
+    func execute() async throws -> [Route] {
         [
             Route(
                 id: UUID(),
@@ -270,18 +258,12 @@ private struct PreviewCreateDispatchRouteRepository:
             )
         ]
     }
-
-    func save(_ route: Route) async throws {}
 }
 
-private struct PreviewCreateDispatchBayRepository:
-    BayRepository {
+private struct PreviewCreateDispatchAvailableBaysUseCase:
+    GetAvailableBaysUseCase {
 
-    func getById(_ id: UUID) async throws -> Bay? {
-        nil
-    }
-
-    func getAll() async throws -> [Bay] {
+    func execute() async throws -> [Bay] {
         [
             Bay(
                 id: UUID(),
@@ -295,8 +277,6 @@ private struct PreviewCreateDispatchBayRepository:
             )
         ]
     }
-
-    func save(_ bay: Bay) async throws {}
 }
 
 private struct PreviewCreateDispatchUseCase:

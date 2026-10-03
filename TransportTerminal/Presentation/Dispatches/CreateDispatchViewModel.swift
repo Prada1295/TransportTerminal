@@ -12,9 +12,10 @@ import Observation
 @Observable
 final class CreateDispatchViewModel {
 
-    private let vehicleRepository: VehicleRepository
-    private let routeRepository: RouteRepository
-    private let bayRepository: BayRepository
+    private let getVehiclesInsideTerminalUseCase:
+        GetVehiclesInsideTerminalUseCase
+    private let getActiveRoutesUseCase: GetActiveRoutesUseCase
+    private let getAvailableBaysUseCase: GetAvailableBaysUseCase
     private let createDispatchUseCase: CreateDispatchUseCase
 
     private(set) var vehicles: [Vehicle] = []
@@ -39,14 +40,16 @@ final class CreateDispatchViewModel {
     }
 
     init(
-        vehicleRepository: VehicleRepository,
-        routeRepository: RouteRepository,
-        bayRepository: BayRepository,
+        getVehiclesInsideTerminalUseCase:
+            GetVehiclesInsideTerminalUseCase,
+        getActiveRoutesUseCase: GetActiveRoutesUseCase,
+        getAvailableBaysUseCase: GetAvailableBaysUseCase,
         createDispatchUseCase: CreateDispatchUseCase
     ) {
-        self.vehicleRepository = vehicleRepository
-        self.routeRepository = routeRepository
-        self.bayRepository = bayRepository
+        self.getVehiclesInsideTerminalUseCase =
+            getVehiclesInsideTerminalUseCase
+        self.getActiveRoutesUseCase = getActiveRoutesUseCase
+        self.getAvailableBaysUseCase = getAvailableBaysUseCase
         self.createDispatchUseCase = createDispatchUseCase
     }
 
@@ -59,9 +62,10 @@ final class CreateDispatchViewModel {
         }
 
         do {
-            async let loadedVehicles = vehicleRepository.getAll()
-            async let loadedRoutes = routeRepository.getAll()
-            async let loadedBays = bayRepository.getAll()
+            async let loadedVehicles =
+                getVehiclesInsideTerminalUseCase.execute()
+            async let loadedRoutes = getActiveRoutesUseCase.execute()
+            async let loadedBays = getAvailableBaysUseCase.execute()
 
             vehicles = try await loadedVehicles
             routes = try await loadedRoutes

@@ -11,20 +11,23 @@ import Observation
 @Observable
 final class DispatchesViewModel {
 
-    private let getActiveDispatchesUseCase: GetActiveDispatchesUseCase
+    private let getActiveDispatchDetailsUseCase:
+        GetActiveDispatchDetailsUseCase
     private let cancelDispatchUseCase: CancelDispatchUseCase
     private let executeDispatchUseCase: ExecuteDispatchUseCase
 
-    private(set) var dispatches: [Dispatch] = []
+    private(set) var dispatches: [DispatchDetailsResult] = []
     private(set) var isLoading = false
     private(set) var errorMessage: String?
 
     init(
-        getActiveDispatchesUseCase: GetActiveDispatchesUseCase,
+        getActiveDispatchDetailsUseCase:
+            GetActiveDispatchDetailsUseCase,
         cancelDispatchUseCase: CancelDispatchUseCase,
         executeDispatchUseCase: ExecuteDispatchUseCase
     ) {
-        self.getActiveDispatchesUseCase = getActiveDispatchesUseCase
+        self.getActiveDispatchDetailsUseCase =
+            getActiveDispatchDetailsUseCase
         self.cancelDispatchUseCase = cancelDispatchUseCase
         self.executeDispatchUseCase = executeDispatchUseCase
     }
@@ -39,14 +42,14 @@ final class DispatchesViewModel {
         }
 
         do {
-            dispatches = try await getActiveDispatchesUseCase.execute()
+            dispatches = try await getActiveDispatchDetailsUseCase.execute()
         } catch {
             dispatches = []
             errorMessage = "Unable to load dispatch information."
         }
     }
 
-    func cancelDispatch(_ dispatch: Dispatch) async {
+    func cancelDispatch(_ dispatch: DispatchDetailsResult) async {
 
         errorMessage = nil
 
@@ -62,7 +65,7 @@ final class DispatchesViewModel {
         }
     }
 
-    func executeDispatch(_ dispatch: Dispatch) async {
+    func executeDispatch(_ dispatch: DispatchDetailsResult) async {
 
         errorMessage = nil
 

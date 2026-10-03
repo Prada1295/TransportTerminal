@@ -16,14 +16,14 @@ struct DispatchesViewModelTests {
     @Test
     func loadDispatchesWhenUseCaseSucceedsLoadsDispatches() async {
 
-        let dispatch = makeDispatch()
+        let dispatch = makeDispatchDetails()
 
-        let getActiveDispatches = FakeGetActiveDispatchesUseCase(
+        let getActiveDispatches = FakeGetActiveDispatchDetailsUseCase(
             result: [dispatch]
         )
 
         let sut = makeSUT(
-            getActiveDispatchesUseCase: getActiveDispatches
+            getActiveDispatchDetailsUseCase: getActiveDispatches
         )
 
         await sut.loadDispatches()
@@ -37,12 +37,12 @@ struct DispatchesViewModelTests {
     @Test
     func loadDispatchesWhenUseCaseFailsClearsDispatchesAndSetsError() async {
 
-        let getActiveDispatches = FakeGetActiveDispatchesUseCase(
+        let getActiveDispatches = FakeGetActiveDispatchDetailsUseCase(
             error: TerminalError.dispatchNotFound
         )
 
         let sut = makeSUT(
-            getActiveDispatchesUseCase: getActiveDispatches
+            getActiveDispatchDetailsUseCase: getActiveDispatches
         )
 
         await sut.loadDispatches()
@@ -60,16 +60,16 @@ struct DispatchesViewModelTests {
     @Test
     func cancelDispatchWhenUseCaseSucceedsExecutesAndReloadsDispatches() async {
 
-        let dispatch = makeDispatch()
+        let dispatch = makeDispatchDetails()
 
-        let getActiveDispatches = FakeGetActiveDispatchesUseCase(
+        let getActiveDispatches = FakeGetActiveDispatchDetailsUseCase(
             result: [dispatch]
         )
 
         let cancelDispatch = FakeCancelDispatchUseCase()
 
         let sut = makeSUT(
-            getActiveDispatchesUseCase: getActiveDispatches,
+            getActiveDispatchDetailsUseCase: getActiveDispatches,
             cancelDispatchUseCase: cancelDispatch
         )
 
@@ -93,9 +93,9 @@ struct DispatchesViewModelTests {
     @Test
     func cancelDispatchWhenUseCaseFailsSetsError() async {
 
-        let dispatch = makeDispatch()
+        let dispatch = makeDispatchDetails()
 
-        let getActiveDispatches = FakeGetActiveDispatchesUseCase(
+        let getActiveDispatches = FakeGetActiveDispatchDetailsUseCase(
             result: [dispatch]
         )
 
@@ -104,7 +104,7 @@ struct DispatchesViewModelTests {
         )
 
         let sut = makeSUT(
-            getActiveDispatchesUseCase: getActiveDispatches,
+            getActiveDispatchDetailsUseCase: getActiveDispatches,
             cancelDispatchUseCase: cancelDispatch
         )
 
@@ -128,16 +128,16 @@ struct DispatchesViewModelTests {
     @Test
     func executeDispatchWhenUseCaseSucceedsExecutesAndReloadsDispatches() async {
 
-        let dispatch = makeDispatch()
+        let dispatch = makeDispatchDetails()
 
-        let getActiveDispatches = FakeGetActiveDispatchesUseCase(
+        let getActiveDispatches = FakeGetActiveDispatchDetailsUseCase(
             result: [dispatch]
         )
 
         let executeDispatch = FakeExecuteDispatchUseCase()
 
         let sut = makeSUT(
-            getActiveDispatchesUseCase: getActiveDispatches,
+            getActiveDispatchDetailsUseCase: getActiveDispatches,
             executeDispatchUseCase: executeDispatch
         )
 
@@ -161,9 +161,9 @@ struct DispatchesViewModelTests {
     @Test
     func executeDispatchWhenUseCaseFailsSetsError() async {
 
-        let dispatch = makeDispatch()
+        let dispatch = makeDispatchDetails()
 
-        let getActiveDispatches = FakeGetActiveDispatchesUseCase(
+        let getActiveDispatches = FakeGetActiveDispatchDetailsUseCase(
             result: [dispatch]
         )
 
@@ -172,7 +172,7 @@ struct DispatchesViewModelTests {
         )
 
         let sut = makeSUT(
-            getActiveDispatchesUseCase: getActiveDispatches,
+            getActiveDispatchDetailsUseCase: getActiveDispatches,
             executeDispatchUseCase: executeDispatch
         )
 
@@ -198,8 +198,9 @@ struct DispatchesViewModelTests {
 private extension DispatchesViewModelTests {
 
     func makeSUT(
-        getActiveDispatchesUseCase: GetActiveDispatchesUseCase =
-            FakeGetActiveDispatchesUseCase(),
+        getActiveDispatchDetailsUseCase:
+            GetActiveDispatchDetailsUseCase =
+                FakeGetActiveDispatchDetailsUseCase(),
 
         cancelDispatchUseCase: CancelDispatchUseCase =
             FakeCancelDispatchUseCase(),
@@ -209,27 +210,38 @@ private extension DispatchesViewModelTests {
     ) -> DispatchesViewModel {
 
         DispatchesViewModel(
-            getActiveDispatchesUseCase: getActiveDispatchesUseCase,
+            getActiveDispatchDetailsUseCase:
+                getActiveDispatchDetailsUseCase,
             cancelDispatchUseCase: cancelDispatchUseCase,
             executeDispatchUseCase: executeDispatchUseCase
         )
     }
 
-    func makeDispatch(
+    func makeDispatchDetails(
         id: UUID = UUID(),
         vehicleId: UUID = UUID(),
+        vehiclePlate: String = "ABC123",
+        vehicleType: VehicleType = .bus,
         routeId: UUID = UUID(),
+        routeOrigin: String = "Medellin",
+        routeDestination: String = "Bogota",
         bayId: UUID = UUID(),
+        bayCode: String = "B01",
         scheduledDeparture: Date = Date(),
         actualDeparture: Date? = nil,
         status: DispatchStatus = .scheduled
-    ) -> Dispatch {
+    ) -> DispatchDetailsResult {
 
-        Dispatch(
+        DispatchDetailsResult(
             id: id,
             vehicleId: vehicleId,
+            vehiclePlate: vehiclePlate,
+            vehicleType: vehicleType,
             routeId: routeId,
+            routeOrigin: routeOrigin,
+            routeDestination: routeDestination,
             bayId: bayId,
+            bayCode: bayCode,
             scheduledDeparture: scheduledDeparture,
             actualDeparture: actualDeparture,
             status: status
@@ -238,25 +250,25 @@ private extension DispatchesViewModelTests {
 }
 
 
-// MARK: - Fake GetActiveDispatches
+// MARK: - Fake GetActiveDispatchDetails
 
-private final class FakeGetActiveDispatchesUseCase:
-    GetActiveDispatchesUseCase {
+private final class FakeGetActiveDispatchDetailsUseCase:
+    GetActiveDispatchDetailsUseCase {
 
-    private let result: [Dispatch]
+    private let result: [DispatchDetailsResult]
     private let error: Error?
 
     private(set) var executeCallCount = 0
 
     init(
-        result: [Dispatch] = [],
+        result: [DispatchDetailsResult] = [],
         error: Error? = nil
     ) {
         self.result = result
         self.error = error
     }
 
-    func execute() async throws -> [Dispatch] {
+    func execute() async throws -> [DispatchDetailsResult] {
 
         executeCallCount += 1
 

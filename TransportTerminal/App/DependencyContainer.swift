@@ -54,6 +54,17 @@ public final class DependencyContainer {
     public func makeGetVehiclesInsideTerminalUseCase() -> GetVehiclesInsideTerminalUseCase {
         GetVehiclesInsideTerminal(vehicleRepository: vehicleRepository)
     }
+
+    public func makeGetActiveRoutesUseCase() -> GetActiveRoutesUseCase {
+        GetActiveRoutes(routeRepository: routeRepository)
+    }
+
+    public func makeGetAvailableBaysUseCase() -> GetAvailableBaysUseCase {
+        GetAvailableBays(
+            bayRepository: bayRepository,
+            dispatchRepository: dispatchRepository
+        )
+    }
     
     public func makeGetVehiclesUseCase() -> GetVehiclesUseCase {
         GetVehicles(
@@ -79,6 +90,17 @@ public final class DependencyContainer {
             dispatchRepository: dispatchRepository
         )
     }
+
+    public func makeGetActiveDispatchDetailsUseCase() ->
+        GetActiveDispatchDetailsUseCase {
+
+        GetActiveDispatchDetails(
+            dispatchRepository: dispatchRepository,
+            vehicleRepository: vehicleRepository,
+            routeRepository: routeRepository,
+            bayRepository: bayRepository
+        )
+    }
     
     public func makeExecuteDispatchUseCase() -> ExecuteDispatchUseCase {
         ExecuteDispatch(
@@ -93,7 +115,6 @@ public final class DependencyContainer {
             companyRepository: companyRepository
         )
     }
-    
     @MainActor
     func makeHomeViewModel() -> HomeViewModel {
         HomeViewModel(
@@ -125,12 +146,40 @@ public final class DependencyContainer {
     @MainActor
     func makeDispatchesViewModel() -> DispatchesViewModel {
         DispatchesViewModel(
-            getActiveDispatchesUseCase:
-                makeGetActiveDispatchesUseCase(),
+            getActiveDispatchDetailsUseCase:
+                makeGetActiveDispatchDetailsUseCase(),
             cancelDispatchUseCase:
                 makeCancelDispatchUseCase(),
             executeDispatchUseCase:
                 makeExecuteDispatchUseCase()
+        )
+    }
+
+    @MainActor
+    func makeDispatchDetailViewModel(
+        dispatch: DispatchDetailsResult
+    ) -> DispatchDetailViewModel {
+
+        DispatchDetailViewModel(
+            dispatch: dispatch,
+            cancelDispatchUseCase:
+                makeCancelDispatchUseCase(),
+            executeDispatchUseCase:
+                makeExecuteDispatchUseCase()
+        )
+    }
+
+    @MainActor
+    func makeCreateDispatchViewModel() -> CreateDispatchViewModel {
+        CreateDispatchViewModel(
+            getVehiclesInsideTerminalUseCase:
+                makeGetVehiclesInsideTerminalUseCase(),
+            getActiveRoutesUseCase:
+                makeGetActiveRoutesUseCase(),
+            getAvailableBaysUseCase:
+                makeGetAvailableBaysUseCase(),
+            createDispatchUseCase:
+                makeCreateDispatchUseCase()
         )
     }
     
@@ -151,7 +200,4 @@ public final class DependencyContainer {
                 makeRegisterVehicleExitUseCase()
         )
     }
-    
 }
-
-

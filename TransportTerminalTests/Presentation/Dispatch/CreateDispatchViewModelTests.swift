@@ -20,25 +20,25 @@ struct CreateDispatchViewModelTests {
         let route = makeRoute()
         let bay = makeBay()
 
-        let vehicleRepository =
-            CreateDispatchViewModelFakeVehicleRepository(
+        let vehiclesUseCase =
+            CreateDispatchViewModelFakeVehiclesInsideTerminalUseCase(
                 vehicles: [vehicle]
             )
 
-        let routeRepository =
-            CreateDispatchViewModelFakeRouteRepository(
+        let routesUseCase =
+            CreateDispatchViewModelFakeActiveRoutesUseCase(
                 routes: [route]
             )
 
-        let bayRepository =
-            CreateDispatchViewModelFakeBayRepository(
+        let baysUseCase =
+            CreateDispatchViewModelFakeAvailableBaysUseCase(
                 bays: [bay]
             )
 
         let sut = makeSUT(
-            vehicleRepository: vehicleRepository,
-            routeRepository: routeRepository,
-            bayRepository: bayRepository
+            getVehiclesInsideTerminalUseCase: vehiclesUseCase,
+            getActiveRoutesUseCase: routesUseCase,
+            getAvailableBaysUseCase: baysUseCase
         )
 
         await sut.loadOptions()
@@ -58,21 +58,21 @@ struct CreateDispatchViewModelTests {
 
     @Test
     func loadOptionsWhenRepositoryFailsClearsOptionsAndShowsError() async {
-        let vehicleRepository =
-            CreateDispatchViewModelFakeVehicleRepository(
+        let vehiclesUseCase =
+            CreateDispatchViewModelFakeVehiclesInsideTerminalUseCase(
                 error: TerminalError.vehicleNotFound
             )
 
-        let routeRepository =
-            CreateDispatchViewModelFakeRouteRepository()
+        let routesUseCase =
+            CreateDispatchViewModelFakeActiveRoutesUseCase()
 
-        let bayRepository =
-            CreateDispatchViewModelFakeBayRepository()
+        let baysUseCase =
+            CreateDispatchViewModelFakeAvailableBaysUseCase()
 
         let sut = makeSUT(
-            vehicleRepository: vehicleRepository,
-            routeRepository: routeRepository,
-            bayRepository: bayRepository
+            getVehiclesInsideTerminalUseCase: vehiclesUseCase,
+            getActiveRoutesUseCase: routesUseCase,
+            getAvailableBaysUseCase: baysUseCase
         )
 
         await sut.loadOptions()
@@ -286,20 +286,24 @@ struct CreateDispatchViewModelTests {
 private extension CreateDispatchViewModelTests {
 
     func makeSUT(
-        vehicleRepository: VehicleRepository =
-            CreateDispatchViewModelFakeVehicleRepository(),
-        routeRepository: RouteRepository =
-            CreateDispatchViewModelFakeRouteRepository(),
-        bayRepository: BayRepository =
-            CreateDispatchViewModelFakeBayRepository(),
+        getVehiclesInsideTerminalUseCase:
+            GetVehiclesInsideTerminalUseCase =
+                CreateDispatchViewModelFakeVehiclesInsideTerminalUseCase(),
+        getActiveRoutesUseCase: GetActiveRoutesUseCase =
+            CreateDispatchViewModelFakeActiveRoutesUseCase(),
+        getAvailableBaysUseCase: GetAvailableBaysUseCase =
+            CreateDispatchViewModelFakeAvailableBaysUseCase(),
         createDispatchUseCase: CreateDispatchUseCase =
             CreateDispatchViewModelFakeCreateDispatchUseCase()
     ) -> CreateDispatchViewModel {
 
         CreateDispatchViewModel(
-            vehicleRepository: vehicleRepository,
-            routeRepository: routeRepository,
-            bayRepository: bayRepository,
+            getVehiclesInsideTerminalUseCase:
+                getVehiclesInsideTerminalUseCase,
+            getActiveRoutesUseCase:
+                getActiveRoutesUseCase,
+            getAvailableBaysUseCase:
+                getAvailableBaysUseCase,
             createDispatchUseCase: createDispatchUseCase
         )
     }
@@ -364,8 +368,8 @@ private extension CreateDispatchViewModelTests {
 
 // MARK: - Fakes
 
-final class CreateDispatchViewModelFakeVehicleRepository:
-    VehicleRepository {
+final class CreateDispatchViewModelFakeVehiclesInsideTerminalUseCase:
+    GetVehiclesInsideTerminalUseCase {
 
     private let vehicles: [Vehicle]
     private let error: TerminalError?
@@ -378,31 +382,17 @@ final class CreateDispatchViewModelFakeVehicleRepository:
         self.error = error
     }
 
-    func getAll() async throws -> [Vehicle] {
+    func execute() async throws -> [Vehicle] {
         if let error {
             throw error
         }
 
         return vehicles
     }
-
-    func getById(
-        _ id: UUID
-    ) async throws -> Vehicle? {
-        vehicles.first { $0.id == id }
-    }
-
-    func save(
-        _ vehicle: Vehicle
-    ) async throws {}
-
-    func update(
-        _ vehicle: Vehicle
-    ) async throws {}
 }
 
-final class CreateDispatchViewModelFakeRouteRepository:
-    RouteRepository {
+final class CreateDispatchViewModelFakeActiveRoutesUseCase:
+    GetActiveRoutesUseCase {
 
     private let routes: [Route]
 
@@ -412,23 +402,13 @@ final class CreateDispatchViewModelFakeRouteRepository:
         self.routes = routes
     }
 
-    func getById(
-        _ id: UUID
-    ) async throws -> Route? {
-        routes.first { $0.id == id }
-    }
-
-    func getAll() async throws -> [Route] {
+    func execute() async throws -> [Route] {
         routes
     }
-
-    func save(
-        _ route: Route
-    ) async throws {}
 }
 
-final class CreateDispatchViewModelFakeBayRepository:
-    BayRepository {
+final class CreateDispatchViewModelFakeAvailableBaysUseCase:
+    GetAvailableBaysUseCase {
 
     private let bays: [Bay]
 
@@ -438,19 +418,9 @@ final class CreateDispatchViewModelFakeBayRepository:
         self.bays = bays
     }
 
-    func getById(
-        _ id: UUID
-    ) async throws -> Bay? {
-        bays.first { $0.id == id }
-    }
-
-    func getAll() async throws -> [Bay] {
+    func execute() async throws -> [Bay] {
         bays
     }
-
-    func save(
-        _ bay: Bay
-    ) async throws {}
 }
 
 final class CreateDispatchViewModelFakeCreateDispatchUseCase:

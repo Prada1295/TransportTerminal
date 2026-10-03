@@ -9,11 +9,26 @@ import SwiftUI
 struct DispatchesView: View {
 
     @State private var viewModel: DispatchesViewModel
+    @State private var showingCreateDispatch = false
 
-    init(viewModel: DispatchesViewModel) {
+    private let createDispatchViewModelFactory: () -> CreateDispatchViewModel
+    private let dispatchDetailViewModelFactory:
+        (DispatchDetailsResult) -> DispatchDetailViewModel
+
+    init(
+        viewModel: DispatchesViewModel,
+        createDispatchViewModelFactory:
+            @escaping () -> CreateDispatchViewModel,
+        dispatchDetailViewModelFactory:
+            @escaping (DispatchDetailsResult) -> DispatchDetailViewModel
+    ) {
         _viewModel = State(
             initialValue: viewModel
         )
+        self.createDispatchViewModelFactory =
+            createDispatchViewModelFactory
+        self.dispatchDetailViewModelFactory =
+            dispatchDetailViewModelFactory
     }
 
     var body: some View {
@@ -33,7 +48,7 @@ struct DispatchesView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        // Create Dispatch will be connected later.
+                        showingCreateDispatch = true
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -45,6 +60,18 @@ struct DispatchesView: View {
             }
             .refreshable {
                 await viewModel.loadDispatches()
+            }
+            .sheet(
+                isPresented: $showingCreateDispatch,
+                onDismiss: {
+                    Task {
+                        await viewModel.loadDispatches()
+                    }
+                }
+            ) {
+                CreateDispatchView(
+                    viewModel: createDispatchViewModelFactory()
+                )
             }
         }
     }
@@ -60,7 +87,14 @@ private extension DispatchesView {
             Section("Today's Operations") {
                 ForEach(viewModel.dispatches) { dispatch in
                     NavigationLink {
-                        Text("Dispatch Detail")
+                        DispatchDetailView(
+                            viewModel:
+                                dispatchDetailViewModelFactory(dispatch)
+                        ) {
+                            Task {
+                                await viewModel.loadDispatches()
+                            }
+                        }
                     } label: {
                         DispatchRow(dispatch: dispatch)
                     }
@@ -106,7 +140,7 @@ private extension DispatchesView {
 
 private struct DispatchRow: View {
 
-    let dispatch: Dispatch
+    let dispatch: DispatchDetailsResult
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -125,19 +159,19 @@ private struct DispatchRow: View {
                 .foregroundStyle(.secondary)
 
             Text(
-                "\(dispatch.routeId.uuidString.prefix(8))"
+                "\(dispatch.routeOrigin) to \(dispatch.routeDestination)"
             )
             .font(.subheadline)
 
             HStack(spacing: 16) {
 
                 Label(
-                    String(dispatch.vehicleId.uuidString.prefix(8)),
+                    dispatch.vehiclePlate,
                     systemImage: "bus"
                 )
 
                 Label(
-                    String(dispatch.bayId.uuidString.prefix(8)),
+                    dispatch.bayCode,
                     systemImage: "rectangle.split.3x1"
                 )
             }
@@ -148,15 +182,60 @@ private struct DispatchRow: View {
     }
 
     private var statusBadge: some View {
-        Text(dispatch.status.rawValue.capitalized)
+        Text(dispatch.status.displayName)
             .font(.caption)
             .fontWeight(.semibold)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(
-                Color.secondary.opacity(0.12),
+                dispatch.status.tint.opacity(0.15),
                 in: Capsule()
             )
+            .foregroundStyle(dispatch.status.tint)
+    }
+}
+
+
+// MARK: - Presentation Helpers
+
+private extension DispatchStatus {
+
+    var displayName: String {
+        switch self {
+        case .scheduled:
+            return "Scheduled"
+
+        case .boarding:
+            return "Boarding"
+
+        case .departed:
+            return "Departed"
+
+        case .cancelled:
+            return "Cancelled"
+
+        case .delayed:
+            return "Delayed"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .scheduled:
+            return .blue
+
+        case .boarding:
+            return .orange
+
+        case .departed:
+            return .green
+
+        case .cancelled:
+            return .red
+
+        case .delayed:
+            return .yellow
+        }
     }
 }
 
@@ -166,24 +245,60 @@ private struct DispatchRow: View {
 #Preview {
     DispatchesView(
         viewModel: DispatchesViewModel(
-            getActiveDispatchesUseCase:
-                PreviewGetActiveDispatchesUseCase(),
+            getActiveDispatchDetailsUseCase:
+                PreviewGetActiveDispatchDetailsUseCase(),
             cancelDispatchUseCase:
                 PreviewCancelDispatchUseCase(),
             executeDispatchUseCase:
                 PreviewExecuteDispatchUseCase()
-        )
+        ),
+        createDispatchViewModelFactory: {
+            CreateDispatchViewModel(
+                getVehiclesInsideTerminalUseCase:
+                    PreviewCreateDispatchVehiclesUseCase(),
+                getActiveRoutesUseCase:
+                    PreviewCreateDispatchRoutesUseCase(),
+                getAvailableBaysUseCase:
+                    PreviewCreateDispatchBaysUseCase(),
+                createDispatchUseCase:
+                    PreviewCreateDispatchUseCase()
+            )
+        },
+        dispatchDetailViewModelFactory: { dispatch in
+            DispatchDetailViewModel(
+                dispatch: dispatch,
+                cancelDispatchUseCase:
+                    PreviewCancelDispatchUseCase(),
+                executeDispatchUseCase:
+                    PreviewExecuteDispatchUseCase()
+            )
+        }
     )
 }
 
 
 // MARK: - Preview Fakes
 
-private struct PreviewGetActiveDispatchesUseCase:
-    GetActiveDispatchesUseCase {
+private struct PreviewGetActiveDispatchDetailsUseCase:
+    GetActiveDispatchDetailsUseCase {
 
-    func execute() async throws -> [Dispatch] {
-        []
+    func execute() async throws -> [DispatchDetailsResult] {
+        [
+            DispatchDetailsResult(
+                id: UUID(),
+                vehicleId: UUID(),
+                vehiclePlate: "ABC123",
+                vehicleType: .bus,
+                routeId: UUID(),
+                routeOrigin: "Medellin",
+                routeDestination: "Bogota",
+                bayId: UUID(),
+                bayCode: "B01",
+                scheduledDeparture: Date(),
+                actualDeparture: nil,
+                status: .scheduled
+            )
+        ]
     }
 }
 
@@ -206,5 +321,50 @@ private struct PreviewExecuteDispatchUseCase:
     ) async throws -> ExecuteDispatchResult {
 
         fatalError("Preview only")
+    }
+}
+
+private struct PreviewCreateDispatchVehiclesUseCase:
+    GetVehiclesInsideTerminalUseCase {
+
+    func execute() async throws -> [Vehicle] {
+        []
+    }
+}
+
+private struct PreviewCreateDispatchRoutesUseCase:
+    GetActiveRoutesUseCase {
+
+    func execute() async throws -> [Route] {
+        []
+    }
+}
+
+private struct PreviewCreateDispatchBaysUseCase:
+    GetAvailableBaysUseCase {
+
+    func execute() async throws -> [Bay] {
+        []
+    }
+}
+
+private struct PreviewCreateDispatchUseCase:
+    CreateDispatchUseCase {
+
+    func execute(
+        vehicleId: UUID,
+        routeId: UUID,
+        bayId: UUID,
+        scheduledDeparture: Date
+    ) async throws -> CreateDispatchResult {
+
+        CreateDispatchResult(
+            dispatchId: UUID(),
+            vehicleId: vehicleId,
+            routeId: routeId,
+            bayId: bayId,
+            scheduledDeparture: scheduledDeparture,
+            status: .scheduled
+        )
     }
 }

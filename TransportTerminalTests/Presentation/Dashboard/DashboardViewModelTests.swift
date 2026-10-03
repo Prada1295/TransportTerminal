@@ -142,14 +142,23 @@ private extension DashboardViewModelTests {
         getVehiclesInsideTerminalUseCase:
             GetVehiclesInsideTerminalUseCase,
         getVehiclesUseCase:
-            GetVehiclesUseCase
+            GetVehiclesUseCase,
+        getActiveDispatchesUseCase:
+            GetActiveDispatchesUseCase =
+                FakeGetActiveDispatchesUseCase(),
+        bayRepository: BayRepository =
+            FakeDashboardBayRepository()
     ) -> DashboardViewModel {
 
         DashboardViewModel(
             getVehiclesInsideTerminalUseCase:
                 getVehiclesInsideTerminalUseCase,
             getVehiclesUseCase:
-                getVehiclesUseCase
+                getVehiclesUseCase,
+            getActiveDispatchesUseCase:
+                getActiveDispatchesUseCase,
+            bayRepository:
+                bayRepository
         )
     }
 
@@ -171,6 +180,56 @@ private extension DashboardViewModelTests {
             status: status
         )
     }
+}
+
+
+// MARK: - Fake Get Active Dispatches
+
+private final class FakeGetActiveDispatchesUseCase:
+    GetActiveDispatchesUseCase {
+
+    private let dispatches: [Dispatch]
+    private let error: Error?
+
+    init(
+        dispatches: [Dispatch] = [],
+        error: Error? = nil
+    ) {
+        self.dispatches = dispatches
+        self.error = error
+    }
+
+    func execute() async throws -> [Dispatch] {
+
+        if let error {
+            throw error
+        }
+
+        return dispatches
+    }
+}
+
+
+// MARK: - Fake Bay Repository
+
+private final class FakeDashboardBayRepository:
+    BayRepository {
+
+    private let bays: [Bay]
+
+    init(bays: [Bay] = []) {
+        self.bays = bays
+    }
+
+    func getById(_ id: UUID) async throws -> Bay? {
+        bays.first { $0.id == id }
+    }
+
+    func getAll() async throws -> [Bay] {
+        bays
+    }
+
+    func save(_ bay: Bay) async throws {}
 }
 
 
